@@ -1,0 +1,16 @@
+{
+  "name": "preentrega",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "nodemon main.js"
+  },
+  "keywords": [],
+  "author": "Ezequiel Barrera",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0",
+    "uuid4": "^2.0.3"
+  }
+}

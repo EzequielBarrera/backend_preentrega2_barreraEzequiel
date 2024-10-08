@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Age of empires",
+    "description": "hola",
+    "price": 2000,
+    "thumbnail": "no img",
+    "code": "estrategia1",
+    "stock": 10,
+    "status": true,
+    "category": "estrategia",
+    "id": "2e9739cb-3fca-4d5d-b438-42502fbdcbcd"
+  },
+  {
+    "title": "CS:GO",
+    "description": "pium pium",
+    "price": 2000,
+    "thumbnail": "no img",
+    "code": "shooter1",
+    "stock": 5,
+    "status": true,
+    "category": "shooter",
+    "id": "58c631a9-204c-4dff-9509-23145c843cfa"
+  }
+]
