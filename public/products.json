@@ -11,14 +11,14 @@
     "id": "2e9739cb-3fca-4d5d-b438-42502fbdcbcd"
   },
   {
-    "title": "CS:GO",
-    "description": "pium pium",
-    "price": 2000,
+    "title": "Plantas vs Zombies",
+    "price": "51",
+    "description": "Jueguito",
+    "stock": "5",
     "thumbnail": "no img",
-    "code": "shooter1",
-    "stock": 5,
+    "code": "2",
     "status": true,
-    "category": "shooter",
-    "id": "58c631a9-204c-4dff-9509-23145c843cfa"
+    "category": "Estrategia",
+    "id": "89c52d5d-103e-4c07-bea8-389bb3ac0839"
   }
 ]
