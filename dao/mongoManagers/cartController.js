@@ -39,25 +39,26 @@ class CartController {
         }
     }
 
-    addToCart = async (cartId, prodId) => {
+    addToCart = async (prodId) => {
+        const cartId = "673008d323a11b84e6e262ce"
+
         try {
-            let cart = await this.getCartById(cartId)
+            const res = await fetch(`/api/carts/${cartId}/product/${prodId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-            const productFound = cart.products.find(item => item.product.toString() === prodId)
-
-            if (productFound) {
-                await Cart.updateOne(
-                    { _id: cartId, 'products.product': prodId },
-                    { $inc: { 'products.$.quantity': 1 } }
-                )
-                return ({ message: 'Product quantity increased' })
+            if (res.ok) {
+                await res.json()
+                console.log("Producto added to card")
             } else {
-                const addProd = { $push: { products: { product: prodId, quantity: 1 } } }
-                await Cart.updateOne({ _id: cartId }, addProd)
-                return ({ message: 'Product added to cart' })
+                await res.json();
+                console.error('Error adding product to cart');
             }
-        } catch (err) {
-            console.log(err)
+        } catch (error) {
+            console.error({ error: error });
         }
     }
 

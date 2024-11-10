@@ -27,6 +27,4 @@ function render(db) {
 
 function addToCart(productId) {
     console.log(`Product with id ${productId} added to the cart.`);
-    // You can add more functionality here to handle the cart logic, 
-    // like updating the UI or saving the product to a cart array.
 }
