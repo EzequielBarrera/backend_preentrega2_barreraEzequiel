@@ -1,6 +1,5 @@
 const socket = io()
-const CartController = require('../dao/mongoManagers/cartController')
-const CM = new CartController()
+
 
 socket.on('products', (data) => {
     render(data)
@@ -16,7 +15,7 @@ function render(db) {
                         <em class="card-title"> ${product.description} </em>
                         <p class="card-text"> <b> $${product.price} </b>  </p>
                         <small>id: ${product._id} </small>
-                        <button class="btn btn-outline-success mt-2" onclick="addToCart("${product._id}")" type="submit">Add to cart</button>
+                        <button class="btn btn-outline-success mt-2" onclick='addToCart("${product._id}")' type="submit">Add to cart</button>
                     </div>
                 </div>
             </div>
@@ -24,9 +23,10 @@ function render(db) {
     }).join(" ")
     document.getElementById('productsContainer').innerHTML = html
 
-    const addToCart = async (prodId) => {
-        await CM.addToCart(prodId)
-        console.log('Product added succesfully')
-    }
 }
 
+function addToCart(productId) {
+    console.log(`Product with id ${productId} added to the cart.`);
+    // You can add more functionality here to handle the cart logic, 
+    // like updating the UI or saving the product to a cart array.
+}
