@@ -1,6 +1,35 @@
 <div class="container">
-    <h1 class="text-center">All products</h1>
-    <div id="productsContainer" class="container text-center"></div>
+    <h1 class="text-center">Products</h1>
+    <div id="productsContainer">
+        {{#each products}}
+            <div class="mb-3 w-50">
+                <div class="card">
+                <h5 class="card-header text-center"> {{this.title}} </h5>
+                <img class="card-image" src="{{this.thumbnail}}" alt="{{this.title}}">
+                <div class="card-body"> 
+                    <em class="card-title"> {{this.description}} </em>
+                    <p class="card-text text-center"> <b> ${{this.price}} </b>  </p>
+                    <small>id: {{this._id}} </small>
+                    <button id="addToCart" class="btn btn-outline-success mt-2" type="submit" onclick="addToCart({{this._id}})">Add to cart</button>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+
+        {{#if pagination.hasPrevPage}}
+            <a style='font-size: 20;' href='/?page={{pagination.prevPage}}'>⬅{{pagination.prevPage}}</a>
+        {{/if}}
+            <a style='font-size: 20;' href='#'>{{pagination.page}}</a>
+        {{#if pagination.hasNextPage}}
+            <a style='font-size: 20;' href='/?page={{pagination.nextPage}}'>{{pagination.nextPage}}➡</a>
+        {{/if}}
+            <br/>
+            <br/>
+        {{#each links}}
+            <a href='{{this.href}}'>{{this.label}}</a>
+        {{/each}}
+
+    </div>
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/index.js"></script>

@@ -1,30 +1,73 @@
 const express = require('express')
-const{ Router } = express
+const { Router } = express
 const router = new Router()
 
-const CartManager = require('../managers/carts-manager')
-const cartManager = new CartManager('./public/carts.json')
+const CartController = require('../dao/mongoManagers/cartController')
+const cartManager = new CartController()
+const Cart = require('../dao/models/cartModel')
 
-router.post('/', (req, res) =>{
-    cartManager.addCart(req.body)
-    res.send({cart: req.body})
+router.get('/', async (req, res) => {
+    await cartManager.getCarts()
+        .then(carts => {
+            if (carts.length) return res.status(200).send({ data: carts })
+            return res.status(204).send({ message: 'Data not found' })
+        })
+        .catch(err => res.status(500).send({ err }))
 })
 
-router.get('/:cid', (req, res) =>{
-    const cartId = parseInt(req.params.cid)
-    const cart = cartManager.getCartById(cartId)
-    if(cart){
-        res.send(cart)
-    }else{
-        res.send('ERROR: cart not found')
+router.get('/:cid', (req, res) => {
+    const cid = req.params.cid
+    const cart = cartManager.getCartById(cid)
+
+    if (cart) Cart.find().populate('products.product')
+        .then(c => res.send({ cart: JSON.stringify(c) }))
+        .catch(err => console.log(err))
+
+})
+
+router.post('/', (req, res) => {
+    const cart = new Cart()
+    cartManager.addCart(cart)
+        .then(cart =>
+            res.send({ message: 'Cart created successfully', data: cart }
+            ))
+        .catch(err => res.status(500).send({ err }))
+})
+
+router.post('/:cid/product/:pid', async (req, res) => {
+    try {
+        const cid = req.params.cid
+        const pid = req.params.pid
+        const productAdd = await cartManager.addToCart(cid, pid)
+        return res.status(200).send({ message: 'Product added to cart', product: productAdd })
+    } catch (error) {
+        res.status(500).send({ message: "Error adding product to cart.", error: error })
     }
 })
 
-router.post('/:cid/product/:pid', (req, res) => {
-    const cartId = parseInt(req.params.cid)
-    const prodId = req.params.pid
-    const productAdd = cartManager.addProductToCart(cartId, prodId)
-    productAdd ? res.send({product: productAdd}) : res.send('error adding product')
+router.put('/:cid/products/:pid', async (req, res) => {
+    const cid = req.params.cid
+    const pid = req.params.pid
+    const newQuantity = req.body.quantity
+    const updateQuant = await cartManager.updateQuantity(cid, pid, newQuantity)
+    if (updateQuant) {
+        return res.status(200).json({ message: 'Product quantity updated successfully', updateQuant });
+    } else {
+        return res.status(404).json({ message: 'Product not found' });
+    }
+})
+
+router.delete('/:cid', async (req, res) => {
+    const cid = req.params.cid
+    const emptyCart = await cartManager.emptyCart(cid)
+    return emptyCart ? res.status(200).send({ message: 'Cart is empty' }) : res.status(500).send({ err })
+})
+
+router.delete('/:cid/products/:pid', async (req, res) => {
+    const cid = req.params.cid
+    const pid = req.params.pid
+    const deleteFromCart = await cartManager.deleteFromCart(cid, pid)
+    return deleteFromCart ? res.status(200).send({ message: 'Product deleted from cart' }) : res.status(500).send({ err })
 })
 
 module.exports = router

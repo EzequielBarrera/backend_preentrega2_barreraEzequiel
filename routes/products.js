@@ -2,41 +2,65 @@ const express = require('express')
 const { Router } = express
 const router = new Router()
 
-const Product_manager = require('../managers/products-manager')
-const prodManager = new Product_manager('./public/products.json')
-const uuid4 = require('uuid4')
+const ProductController = require('../dao/mongoManagers/productController')
+const productManager = new ProductController()
+const Product = require('../dao/models/productModel')
 
-router.get('/', (req, res) => {
-    const limit = req.query.limit
-    const products = prodManager.getProducts()
-    !limit ? res.send({ products: products }) : res.send(products.slice(0, limit))
+router.get('/', async (req, res) => {
+    const { query, limit, page } = req.query
+    try {
+        const data = await productManager.getProducts(query, limit, page)
+
+        return res.status(200).json({
+            status: 'success',
+            payload: data.docs,
+            totalPages: data.totalPages,
+            prevPage: data.prevPage,
+            nextPage: data.nextPage,
+            page: data.page,
+            hasPrevPage: data.hasPrevPage,
+            hasNextPage: data.hasNextPage,
+            prevLink: data.hasPrevPage ? `http://localhost:8080/api/products/?page=${data.prevPage}` : null,
+            nextLink: data.hasNextPage ? `http://localhost:8080/api/products/?page=${data.nextPage}` : null,
+        })
+    } catch (err) {
+        console.log(err)
+    }
 })
 
-router.get('/:id', (req, res) =>{
+router.get('/:id', (req, res) => {
     const id = req.params.id
-    const productFound = prodManager.getProductsById(id)
-    productFound ? res.send(productFound) : res.send('ERROR: product not found')
+    const product = productManager.getProductById(id)
+
+    if (product) return res.status(200).send({ data: product })
+    return res.status(204).send({ message: 'Product not found' })
 })
 
 router.post('/', (req, res) => {
-    const id = uuid4()
-    const product = req.body
-    product.id = id
-    const productAdd = prodManager.addProduct(product, product.id)
-    res.send(productAdd)
-}) 
+    const newProd = req.body
+    const product = new Product(newProd)
+    productManager.addProduct(product)
+        .then(product => {
+            res.status(201).send({ message: "Product created successfully", data: product })
+        })
+        .catch(err => res.status(500).send({ err }))
+})
 
 router.put('/:id', (req, res) => {
     const id = req.params.id
-    const productNew = req.body
-    const productUpdated = prodManager.updateProduct(id, productNew)
-    res.send({updated: productUpdated})
+    const newData = req.body
+    productManager.updateProduct(id, newData)
+        .then(product => {
+            res.status(201).send({ message: 'Product updated successfully', data: product })
+        })
+        .catch(err => res.status(500).send({ err }))
 })
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id
-    const productDeleted = prodManager.deleteProduct(id)
-    res.send(productDeleted)
+    const product = productManager.deleteProduct(id)
+    if (product) return res.status(200).send({ message: 'Product deleted successfully', data: product })
+    return res.status(204).send({ message: 'Error deleting product' })
 })
 
 module.exports = router
